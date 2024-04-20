@@ -43,3 +43,31 @@ describe 'StudentTasks API', type: :request do
 
   end
 end
+
+
+
+describe 'GET /student_tasks/:id/view' do
+  let(:participant) { create(:participant) } # Assuming factories are set up for participant
+
+  before do
+    allow(controller).to receive(:authorize_request).and_return(true) # Mock authorization
+    # //TODO replace :authorize_request your actual authorization method
+  end
+
+  context 'when the participant exists' do
+    it 'returns the participant task view' do
+      get :view, params: { id: participant.id }, headers: { 'Authorization' => "Bearer #{@token}" }
+      expect(response).to have_http_status(:ok)
+      expect(json).to include('assignment_name')
+      # ... additional checks for each expected attribute
+    end
+  end
+
+  context 'when the participant does not exist' do
+    it 'returns a not found message' do
+      get :view, params: { id: 0 }, headers: { 'Authorization' => "Bearer #{@token}" }
+      expect(response).to have_http_status(:not_found)
+      expect(json['error']).to match(/not found/)
+    end
+  end
+end
